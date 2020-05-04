@@ -1,0 +1,76 @@
+//Run once manually to initialize
+function sendGoogleOPTEmails() {
+  //Connect to spreadsheet and load optimizations sheet.
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var opt_sheet = ss.getSheetByName("Optimizations");
+  var finalRow = Math.floor(opt_sheet.getMaxRows());
+  
+  //Create an empty list to hold all of the dates that Vai will have
+  var listOfEntries = new Array();
+  
+  //Walk through opt_sheet to get all of the dates (right now for Vai, but later for everyone)
+  //var iter = 2;
+  //while (iter < opt_sheet.Rows.Count()){
+  //  if (opt_sheet.getRange("C"+iter).Value() == "Vai"){
+  //    listOfDates.push(opt_sheet.getRange("H"+iter).Value());
+  //  }
+  //  iter = iter + 1;
+  //}
+  var AllRows = opt_sheet.getRange("A2:G"+finalRow).getValues();
+  
+  //If column order ever changes (even adding a column), look at this.
+  //IE IF C is no longer names and H is no longer next optimization date, change the index values,
+  AllRows.forEach((row) => {
+              if (row[1] == "Vai"){
+                 listOfEntries.push([CalendarApp.getCalendarById("vai@podmarketinginc.com"), row[7], row[0]]);
+               }
+           });
+//  for each (var row in AllRows) {
+//    if (row[2] == "Vai") {
+//      listOfEntries.push([CalendarApp.getCalendarById("vai@podmarketinginc.com"), row[7], row[0]]);
+//    } 
+//  }
+  
+  //Send notifications for each event on the sheet (right now only for me). 
+listOfEntries.forEach((entry) => {
+                          var eventCal = entry[0];
+                          var account = entry[2];
+                          var title = "Optimizations: " + account;
+                          eventCal.createAllDayEvent(title, entry[1]) 
+                       });
+}
+
+
+//function onEdit(e) {
+//  console.log("Started");
+//  var theRange = e.range;
+//  var columnNumber = theRange.getColumn() - 1;
+//  console.log("columnNumber = " + columnNumber);
+  //if (e.OldValue() != e.NewValue()){
+//    if (columnNumber == 5) {
+//      var rowNumber = theRange.getRow();
+//      console.log("rowNumber = " + rowNumber);
+//      CreateAppointment(rowNumber);
+//    }
+  //}
+//}
+
+//function CreateAppointment(rowNumber){
+//  var ss = SpreadsheetApp.getActiveSpreadsheet();
+//  var opt_sheet = ss.getSheetByName("Optimizations");
+  
+//  var ourRow = opt_sheet.getRange("A"+rowNumber+":G"+rowNumber).getValues();
+//  var row = ourRow[0];
+//  var name = row[1].toLowerCase();
+//  console.log("Name = " + name);
+//  if (name == 'vai') {
+//    var emailAddress = name + "@podmarketinginc.com";
+//    console.log("emailAddress = " + emailAddress);
+//    var eventCal = CalendarApp.getCalendarById(emailAddress);
+//    var accountName = row[0];
+//    var optimizationDate = row[6];
+//    var title = "New Optimization: " + accountName;
+//    eventCal.createAllDayEvent(title, optimizationDate)
+//    console.log("Event created on calendar");
+//  }
+//}
